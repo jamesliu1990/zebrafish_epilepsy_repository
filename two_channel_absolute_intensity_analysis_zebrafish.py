@@ -99,4 +99,13 @@ plot_intensity(nonzero_intensities, avg_video_intensity)
 print(avg_video_intensity)
 print('done')
 
+'''
+TODO
 
+* need to make this analyze both channels
+* need to plot both channel analysis with error bars
+* need to save excel file with RFP values, GFP values, and SD value
+* calculate SD for each frame
+* can try to separate the channels by average intensity?
+
+'''
