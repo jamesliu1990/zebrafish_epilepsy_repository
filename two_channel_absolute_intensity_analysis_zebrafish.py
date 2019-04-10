@@ -36,20 +36,17 @@ def print_img(arr):
     plt.show()
 
 
-def plot_intensity(y, avg):
+def plot_intensity(y, errors, lable):
    
     x = np.arange(len(y))
-    x2 = np.arange(len(y))
-    y2 = np.empty(len(y))
-    y2.fill(avg)
-   
-    plt.plot(x, y)
-    plt.plot(x2, y2, label = 'video average')
+
+    plt.plot(x, y, color='#2F88C0')
+    plt.fill_between(x, y-errors, y+errors, alpha=0.5, edgecolor='#2F88C0', facecolor='#2F88C0')
    
     plt.xlabel('frame')
     plt.ylabel('avg. intensity')
    
-    plt.title('Avg. Intensity over Time')
+    plt.title('Avg. Intensity over Time: Channel' + label)
    
     plt.show()
 
@@ -86,17 +83,31 @@ for i in range(num_ome):
     video = data[i]#grabbing one ome from the dirrectory
     for z in range(len(video)):
         frame = video[z]#still has both channels
-        img = np.array(frame[1])
-        img = famne[0]
-        avg_frame_intensity = np.mean(img)
-        intensities[z+(i*512)] = avg_frame_intensity
+        img0 = np.array(frame[0])
+        img1 = np.array(frame[1])
+        SD0 = np.std(img0)
+        SD1 = np.std(img1)
+        avg_frame_intensity_0 = np.mean(img0)
+        avg_frame_intensity_1 = np.mean(img1)
+        intensities_0[z+(i*512)] = avg_frame_intensity_0
+        intensities_1[z+(i*512)] = avg_frame_intensity_1
+        errors_0[z+(i*512)] = SD0
+        errors_1[z+(i*512)] = SD1
      
-np.savetxt('20170803_fish1.csv', intensities, delimiter = '\n')
-nonzero_intensities = np.array(remove_zeros(intensities))
-avg_video_intensity = np.mean(nonzero_intensities)
-plot_intensity(nonzero_intensities, avg_video_intensity)
+np.savetxt('20170803_fish1___averages_channel_0.csv', intensities_0, delimiter = ', ')
+np.savetxt('20170803_fish1___averages_channel_1.csv', intensities_1, delimiter = ', ')
+np.savetxt('20170803_fish1___errors_channel_0.csv', errors_0, delimiter = ', ')
+np.savetxt('20170803_fish1___errors_channel_1.csv', errors_1, delimiter = ', ')
 
-print(avg_video_intensity)
+nonzero_intensities_0 = np.array(remove_zeros(intensities_0))
+nonzero_intensities_1 = np.array(remove_zeros(intensities_1))
+avg_video_intensity_0 = np.mean(nonzero_intensities_0)
+avg_video_intensity_0 = np.mean(nonzero_intensities_1)
+plot_intensity(intensities_0, errors_0, '0')
+plot_intensity(intensities_1, errors_1, '1')
+
+print ('Channel 0 avg: ' + str(avg_video_intensity_0))
+print ('Channel 1 avg: ' + str(avg_video_intensity_1))
 print('done')
 
 '''
@@ -107,5 +118,6 @@ TODO
 * need to save excel file with RFP values, GFP values, and SD value
 * calculate SD for each frame
 * can try to separate the channels by average intensity?
+* error can be taken in as a np array
 
 '''
