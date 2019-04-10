@@ -36,7 +36,7 @@ def print_img(arr):
     plt.show()
 
 
-def plot_intensity(y, errors, lable):
+def plot_intensity(y, errors, label):
    
     x = np.arange(len(y))
 
@@ -60,7 +60,7 @@ def remove_zeros(arr):
 
 
 #parent dirrectory of the ome files (ie, one fish)
-directory = '/media/lauderdale/mnt/remote_servers/data1/image_data/LightSheetMicroscope/20170803/*.tif'
+directory = '/media/lauderdale/mnt/remote_servers/data1/image_data/LightSheetMicroscope/20170706/20170706_fish2b/20170706_fish2b_0.ome.tif'
 
 print('starting analysis of ' + directory)
 
@@ -68,15 +68,10 @@ data = ImageSequence(directory)
 print('Loaded in the data')
 num_ome = len(data)
 
-video = data[0]
-frame = video[100]
-img = np.array(frame[0])
-print_img(img)
-
-img = np.array(frame[1])
-print_img(img)
-
-intensities = np.zeros(num_ome * 512)
+intensities_0 = np.zeros(num_ome * 512)
+intensities_1 = np.zeros(num_ome * 512)
+errors_0 = np.zeros(num_ome * 512)
+errors_1 = np.zeros(num_ome * 512)
 print('entering for loop')
 for i in range(num_ome):
     print('working on file: ' + str(i))
@@ -85,8 +80,8 @@ for i in range(num_ome):
         frame = video[z]#still has both channels
         img0 = np.array(frame[0])
         img1 = np.array(frame[1])
-        SD0 = np.std(img0)
-        SD1 = np.std(img1)
+        SD0 = np.std(remove_zeros(np.reshape(img0, (1, ))))
+        SD1 = np.std(remove_zeros(np.reshape(img1, (1, ))))
         avg_frame_intensity_0 = np.mean(img0)
         avg_frame_intensity_1 = np.mean(img1)
         intensities_0[z+(i*512)] = avg_frame_intensity_0
@@ -94,10 +89,10 @@ for i in range(num_ome):
         errors_0[z+(i*512)] = SD0
         errors_1[z+(i*512)] = SD1
      
-np.savetxt('20170803_fish1___averages_channel_0.csv', intensities_0, delimiter = ', ')
-np.savetxt('20170803_fish1___averages_channel_1.csv', intensities_1, delimiter = ', ')
-np.savetxt('20170803_fish1___errors_channel_0.csv', errors_0, delimiter = ', ')
-np.savetxt('20170803_fish1___errors_channel_1.csv', errors_1, delimiter = ', ')
+np.savetxt('20170706_fish2b___averages_channel_0.csv', intensities_0, delimiter = ', ')
+np.savetxt('20170706_fish2b___averages_channel_1.csv', intensities_1, delimiter = ', ')
+np.savetxt('20170706_fish2b___errors_channel_0.csv', errors_0, delimiter = ', ')
+np.savetxt('20170706_fish2b___errors_channel_1.csv', errors_1, delimiter = ', ')
 
 nonzero_intensities_0 = np.array(remove_zeros(intensities_0))
 nonzero_intensities_1 = np.array(remove_zeros(intensities_1))
