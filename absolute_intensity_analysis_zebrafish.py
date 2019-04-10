@@ -1,3 +1,35 @@
+'''
+
+Created on Fri Apr  5 16:40:12 2019
+
+@author: Hannah C Schriever and J Branson Byers
+
+DATA STRUCTURE:
+    2 channels
+    1024x2048 pixels
+    512 frames
+    
+VARIABLES:
+    data: (num_ome, 512, 2, 2048, 1024)
+    video: (512, 2, 2048, 1024)
+    frame: (2, 2048, 1024)
+    img: (2048, 1024)
+    
+can itterate through, it will take it out one at a time and do the analysis.
+DO NOT put entire think in np array
+
+ImageSequence(dir)[0] seems to be an entire video with 2 channels
+which cnannel is the right one?
+
+GOALS
+    average intensity of ENTIRE VIDEO - frame wise
+    get avg intensity for each frame, then average those
+    
+    
+Channel 0 is the right one
+
+'''
+
 from pims import ImageSequence
 import numpy as np
 import matplotlib.pyplot as plt
