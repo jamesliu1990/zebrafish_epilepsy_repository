@@ -1,31 +1,15 @@
-'''
-
-Created on Fri Apr  5 16:40:12 2019
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Apr 11 12:25:31 2019
 
 @author: Hannah C Schriever and J Branson Byers
 
-DATA STRUCTURE:
-    2 channels
-    1024x2048 pixels
-    512 frames
-    
-VARIABLES:
-    data: (num_ome, 512, 2, 2048, 1024)
-    video: (512, 2, 2048, 1024)
-    frame: (2, 2048, 1024)
-    img: (2048, 1024)
-    
-can iterate through, it will take it out one at a time and do the analysis.
-DO NOT put entire thing in np array
+DATA STRUCTURE
+data: (num_tif, frames, y, x)
+video: (frame, y, x)
 
-ImageSequence(dir)[0] seems to be an entire video with 2 channels
-which cnannel is the right one?
-
-GOALS
-    average intensity of ENTIRE VIDEO - frame wise
-    get avg intensity for each frame, then average those
-
-'''
+"""
 
 from pims import ImageSequence
 import numpy as np
@@ -36,13 +20,14 @@ def print_img(arr):
     plt.show()
 
 
-def plot_intensity(y, errors, label):
+def plot_intensity(y, errors, error_no_corr, label):
    
     x = np.arange(len(y))
 
     plt.plot(x, y, color='#2F88C0')
-    plt.fill_between(x, y-errors, y+errors, alpha=0.5, edgecolor='#2F88C0', facecolor='#2F88C0')
-   
+    plt.fill_between(x, y-errors, y+errors, alpha=0.5, facecolor='#2F88C0')
+    plt.fill_between(x, y-error_no_corr, y+error_no_corr, alpha=0.5, facecolor='#ff0066')
+    
     plt.xlabel('frame')
     plt.ylabel('avg. intensity')
    
@@ -54,51 +39,55 @@ def remove_zeros(arr):
     
     new_arr = []
     for i in range(len(arr)):
-        if(arr[i] > 150):
+        if(arr[i] > 0):
             new_arr.append(arr[i])
     return new_arr
 
-
 #parent dirrectory of the ome files (ie, one fish)
-directory = '/media/lauderdale/mnt/remote_servers/data1/image_data/LightSheetMicroscope/20170706/20170706_fish2b/20170706_fish2b_0.ome.tif'
+directory = '/media/lauderdale/mnt/remote_servers/data1/image_data/LightSheetMicroscope/20180116/DSLM/fish1_run1_PTZ/fish1_run1_PTZ(10).tif'
 
 print('starting analysis of ' + directory)
 
 data = ImageSequence(directory)
 print('Loaded in the data')
-num_ome = len(data)
+num_tif = len(data)
 
-intensities_0 = np.zeros(num_ome * 512)
-#intensities_1 = np.zeros(num_ome * 512)
-errors_0 = np.zeros(num_ome * 512)
+intensities_0 = np.zeros(num_tif * 1024)
+errors_0 = np.zeros(num_tif * 1024)
+error_not_corrected = np.zeros(num_tif * 1024)
+window_SD = np.zeros(num_tif * 1024)
 #errors_1 = np.zeros(num_ome * 512)
 print('entering for loop')
-for i in range(num_ome):
+for i in range(num_tif):
     print('working on file: ' + str(i))
     video = data[i]#grabbing one ome from the dirrectory
-    for z in range(len(video)):
-        frame = video[z]#still has both channels
-        img0 = np.array(frame[0])
-        #img1 = np.array(frame[1])
-        SD0 = np.std(remove_zeros(img0.flatten()))
-        #SD1 = np.std(remove_zeros(img1.flatten()))
+    #SD_window = np.std(video)
+    for z in range(101, len(video)-101, 2):
+        
+        SD_window = np.std(video[z-100, z+100])
+        img0 = np.array(video[z])
+        SD = np.std(img0)
+        SD0 = abs(SD_window - np.std(img0))
         avg_frame_intensity_0 = np.mean(img0)
-        #avg_frame_intensity_1 = np.mean(img1)
-        intensities_0[z+(i*512)] = avg_frame_intensity_0
-        #intensities_1[z+(i*512)] = avg_frame_intensity_1
-        errors_0[z+(i*512)] = SD0
-        #errors_1[z+(i*512)] = SD1
+        intensities_0[z+(i*1024)] = avg_frame_intensity_0
+        errors_0[z+(i*1024)] = SD0
+        error_not_corrected[z+(i*1024)] = SD
+        window_SD[z+(i*1024)] = SD_window
      
 #np.savetxt('20170706_fish2b___averages_channel_0.csv', intensities_0, delimiter = ', ')
 #np.savetxt('20170706_fish2b___averages_channel_1.csv', intensities_1, delimiter = ', ')
 #np.savetxt('20170706_fish2b___errors_channel_0.csv', errors_0, delimiter = ', ')
 #np.savetxt('20170706_fish2b___errors_channel_1.csv', errors_1, delimiter = ', ')
 
+errors_corrected = np.zeros(num_tif * 1024)
+errors_corrected = error_not_corrected - window_SD
+errors_corrected = np.absolute(errors_corrected)
+
 nonzero_intensities_0 = np.array(remove_zeros(intensities_0))
 #nonzero_intensities_1 = np.array(remove_zeros(intensities_1))
 avg_video_intensity_0 = np.mean(nonzero_intensities_0)
 #avg_video_intensity_1 = np.mean(nonzero_intensities_1)
-plot_intensity(intensities_0, errors_0, '0')
+plot_intensity(nonzero_intensities_0, remove_zeros(errors_corrected), remove_zeros(error_not_corrected), '26')
 #plot_intensity(intensities_1, errors_1, '1')
 
 print ('Channel 0 avg: ' + str(avg_video_intensity_0))
