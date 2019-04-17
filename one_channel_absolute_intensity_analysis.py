@@ -44,8 +44,8 @@ def remove_zeros(arr):
     return new_arr
 
 #parent dirrectory of the ome files (ie, one fish)
-directory = '/media/lauderdale/mnt/remote_servers/data1/image_data/LightSheetMicroscope/20180116/DSLM/fish1_run1_PTZ/fish1_run1_PTZ(10).tif'
-
+#directory = '/media/lauderdale/mnt/remote_servers/data1/image_data/LightSheetMicroscope/20180116/DSLM/fish1_run1_PTZ/fish1_run1_PTZ(10).tif'
+directory = '/media/lauderdale/Samsung_T5/zebrafish_data/GFP_separated'
 print('starting analysis of ' + directory)
 
 data = ImageSequence(directory)

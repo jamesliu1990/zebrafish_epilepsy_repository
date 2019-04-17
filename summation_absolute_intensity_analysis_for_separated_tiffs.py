@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Created on Fri Apr 12 15:42:15 2019
 
@@ -56,7 +54,7 @@ def remove_zeros(arr):
     return new_arr
 
 #parent dirrectory of the ome files (ie, one fish)
-directory = '/media/lauderdale/mnt/remote_servers/data1/image_data/LightSheetMicroscope/20180116/DSLM/fish1_run1_PTZ/fish1_run1_PTZ(10).tif'
+directory = '/media/lauderdale/Samsung_T5/zebrafish_data/GFP_separated'
 
 print('starting analysis of ' + directory)
 
@@ -79,20 +77,22 @@ for i in range(num_tif):
     video = data[i]#grabbing one ome from the dirrectory
     total = total + np.sum(video)
     
-    for z in range(0, window_size, 2):
+    for z in range(0, window_size):
         initial_sums[z] = np.sum(video[z])
     initial_sum_avg = np.mean(remove_zeros(initial_sums))
     
-    for z in range(len(video)-window_size, len(video), 2):
+    for z in range(len(video)-window_size, len(video)):
         for j in range(0, window_size):
             final_sums[j] = np.sum(video[z])
     final_sum_avg = np.mean(remove_zeros(final_sums))
     
-    for z in range(0, len(video)-50, 2):
+    print('here')
+    
+    for z in range(0, len(video)):
         
         if(z >= window_size and z < len(video)-window_size-1):
             for l in range(0,window_size):
-                for n in range(z-window_size, z+window_size, 2):
+                for n in range(z-window_size, z+window_size):
                     window_sums[l] = np.sum(video[n])
             window_avgs[z] = np.mean(remove_zeros(window_sums))
         elif(z < window_size):
@@ -121,4 +121,3 @@ TODO
 
 
 '''
-
