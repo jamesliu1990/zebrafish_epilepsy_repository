@@ -55,21 +55,27 @@ def remove_zeros(arr):
 
 #parent dirrectory of the ome files (ie, one fish)
 directory = '/media/lauderdale/Samsung_T5/zebrafish_data/GFP_separated'
+window_size = 50;
+print('Window Size: ' + str(window_size))
 
 print('starting analysis of ' + directory)
 
 data = ImageSequence(directory)
 print('Loaded in the data')
-num_tif = len(data)
 
-intensities = np.zeros(num_tif * 1024)
-window_avgs = np.zeros(num_tif * 1024)
+print('it takes this long')
+num_tif = len(data)
+num_frames = num_tif * len(data[0])
 total = 0
-window_size = 50;
-print('Window Size: ' + str(window_size))
+print('boop')
+
+#initializing np arrays
+intensities = np.zeros(num_frames)
+window_avgs = np.zeros(num_frames)
 window_sums = np.zeros(window_size)
 initial_sums = np.zeros(window_size)
 final_sums = np.zeros(window_size)
+
 print('entering for loop')
 for i in range(num_tif):
     
