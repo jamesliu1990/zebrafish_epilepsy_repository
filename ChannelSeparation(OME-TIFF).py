@@ -33,8 +33,11 @@ for parent_directory in list_of_parent_directories:
     file_list = []
     for root, dirs, files in os.walk(parent_directory):
         for file in files:
-            if file.endswith('.tif'):
-                file_list.append(os.path.join(root, file))
+            if file.endswith('.tif') and not file.endswith('_suspectedGFP.tif') \
+            and not file.endswith('_suspectedRFP.tif') \
+            and not file.endswith('_designatedRFP.tif') \
+            and not file.endswith('_designatedRFP.tif'):
+                    file_list.append(os.path.join(root, file))
                 
                 
                 ####################
@@ -62,7 +65,7 @@ for parent_directory in list_of_parent_directories:
         #Coordinate 3: width in pixels (2048)
         #data = np.array(ImageSequence(directory), 'uint16')
         data = np.array(pims.open(directory))
-        print('The data has been loaded in')
+        print('The data has been loaded in...')
         
         
         
@@ -89,17 +92,21 @@ for parent_directory in list_of_parent_directories:
             print('Image 1 was brighter. First frame designated RFP.')
             rfp = data[0::2]
             gfp = data[1::2]
+            rfp_designation = image1
+            gfp_designation = image2
             
         else:
             print('Image 2 was brighter. Second frame designated as RFP')
             gfp = data[0::2]
             rfp = data[1::2]
-                
+            rfp_designation = image2
+            gfp_designation = image1
                 
                 
         ##########Saving the data as filename_suspectedXFP.tif##########
-        gfp_save_dir = directory.rsplit('/',1)[0] + '/GFP_separated' 
-        rfp_save_dir = directory.rsplit('/',1)[0] + '/RFP_separated'
+        gfp_save_dir = directory.rsplit('/',1)[0] + '/gfp_separated' 
+        rfp_save_dir = directory.rsplit('/',1)[0] + '/rfp_separated'
+        manual_check_dir = directory.rsplit('/',1)[0] + '/manual_channel_check'
                 
         print('Creating directories...')
         try:
@@ -110,7 +117,12 @@ for parent_directory in list_of_parent_directories:
         try:
             os.mkdir(rfp_save_dir)
         except OSError:
-            print('RFP directory already exists. May overwrite contents.')        
+            print('RFP directory already exists. May overwrite contents.')     
+            
+        try:
+            os.mkdir(manual_check_dir)
+        except OSError:
+            print('Manual check directory already exists. May overwrite contents.') 
         
         
         print('Saving to directories...')
@@ -121,6 +133,14 @@ for parent_directory in list_of_parent_directories:
         rfp_filename = rfp_save_dir + '/' + filename + '_suspectedRFP.tif'
         tf.imsave(rfp_filename, rfp, bigtiff=True)
         print('RFP saved')
+        
+        rfp_manual_filename = manual_check_dir + '/' + filename + '_designatedRFP.tif'
+        tf.imsave(rfp_manual_filename, rfp_designation)
+        print('RFP manual check saved')
+        
+        gfp_manual_filename = manual_check_dir + '/' + filename + '_designatedGFP.tif'
+        tf.imsave(gfp_manual_filename, gfp_designation)
+        print('GFP manual check saved')
         
         print('Script complete.')
                             
