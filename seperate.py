@@ -11,11 +11,13 @@ import pylab as P
 
 
 class seperatechannel(object):
-    
+
+#contructor    
     def __init__(self,img_stack=None):
         self.img = img_stack
         self.str1 = 'gfp.tif'
         self.str2 = 'rfp.tif'
+
         
     def sep(self,img):
 #        test = img[0]
