@@ -17,7 +17,7 @@ import os
 from pandas import ExcelWriter
 from pandas import ExcelFile
     
-def plot_intensity(y, SD, avg, label):
+def plot_intensity(y, SD, avg, label, directory):
    
     x = np.arange(len(y))
     
@@ -31,9 +31,9 @@ def plot_intensity(y, SD, avg, label):
     plt.xlabel('frame')
     plt.ylabel('summation of intensity (*10^8)')
    
-    plt.title('Summation of Intensity over Time: Channel ' + label)
+    plt.title(label)
    
-    plt.show()
+    plt.savefig(directory + '/analysis/' + label + '.pdf')
 
 def remove_zeros(arr):
     
@@ -106,27 +106,36 @@ nonzero_intensities = nonzero_intensities - minimum*2048*1024
 
 avg_intensities = np.array(remove_zeros(avg_intensities))
 avg_intensities = avg_intensities[start_frame:end_frame]
+SD_avg = np.zeros(len(avg_intensities))
 
 window_avgs = np.zeros(len(nonzero_intensities))
-SD = np.zeros(len(nonzero_intensities))
+SD_sum = np.zeros(len(nonzero_intensities))
 
 initial_sum_avg = np.mean(nonzero_intensities[:window_size])
-initial_SD = np.std(nonzero_intensities[:window_size])
+initial_SD_sum = np.std(nonzero_intensities[:window_size])
 final_sum_avg = np.mean(nonzero_intensities[len(nonzero_intensities)-window_size:])
-final_SD = np.std(nonzero_intensities[len(nonzero_intensities)-window_size:])
+final_SD_sum = np.std(nonzero_intensities[len(nonzero_intensities)-window_size:])
+
+initial_avg_avg = np.mean(avg_intensities[:window_size])
+initial_SD_avg = np.std(avg_intensities[:window_size])
+final_avg_avg = np.mean(avg_intensities[len(nonzero_intensities)-window_size:])
+final_SD_avg = np.std(avg_intensities[len(nonzero_intensities)-window_size:])
 
 for i in range(window_size):
     window_avgs[i] = initial_sum_avg
-    SD[i] = initial_SD
+    SD_sum[i] = initial_SD_sum
+    SD_avg[i] = initial_SD_avg
     
 for j in range(len(nonzero_intensities)-window_size, len(nonzero_intensities)):
     window_avgs[j] = final_sum_avg
-    SD[j] = final_SD
+    SD_sum[j] = final_SD_sum
+    SD_avg[i] = final_SD_avg
 
 for t in range(window_size, len(nonzero_intensities)-window_size):
     temp_sum_avg = np.mean(nonzero_intensities[t:t+window_size])
     window_avgs[t] = temp_sum_avg
-    SD[t] = np.std(nonzero_intensities[t:t+window_size])
+    SD_sum[t] = np.std(nonzero_intensities[t:t+window_size])
+    SD_avg[t] = np.std(avg_intensities[t:t+window_size])
     
 
 video_sum_SD = np.zeros(2728)
@@ -136,19 +145,19 @@ video_sum_avg[0] = np.mean(remove_zeros(intensities))
 video_avg = np.zeros(2728)
 video_avg[0] = np.average(avg_intensities)
 
-#plotting the intensity
-plot_intensity(nonzero_intensities, SD, window_avgs, 'Summation of ' + make_label(directory))
-plot_intensity(avg_intensities, np.zeros(2728), avg_intensities, 'Averages of ' + make_label(directory))
-
 #saving analysis to excel file
 try:
     os.mkdir(directory + '/analysis')
 except OSError:
     print('GFP directory already exists. May overwrite contents.')
 
-analysis = {'nonzero_intensities': nonzero_intensities, 'SD': SD, 'window_avgs': window_avgs, 'avg_intensities': avg_intensities, 'video_sum_SD': video_sum_avg, 'video_sum_avg': video_sum_avg, 'video_avg': video_avg}
+analysis = {'nonzero_intensities': nonzero_intensities, 'SD_sum': SD_sum, 'window_avgs': window_avgs, 'avg_intensities': avg_intensities, 'SD_avg': SD_avg, 'video_sum_SD': video_sum_avg, 'video_sum_avg': video_sum_avg, 'video_avg': video_avg}
 file = pd.DataFrame(analysis) 
-file.to_excel(directory + '/analysis/analysis_' + make_label(directory) + '.xlsx')
+file.to_csv(directory + '/analysis/analysis_' + make_label(directory) + '.csv')
+
+#plotting the intensity
+plot_intensity(nonzero_intensities, SD_sum, window_avgs, 'Summation_of_' + make_label(directory), directory)
+plot_intensity(avg_intensities, SD_avg, avg_intensities, 'Averages_of_' + make_label(directory), directory)
 
 print ('total: ' + str(np.sum(nonzero_intensities)))
 print ('minimum: ' + str(minimum))

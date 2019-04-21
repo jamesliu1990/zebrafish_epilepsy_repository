@@ -62,12 +62,13 @@ directories = ['/media/lauderdale/BFR_RAID5/zebrafish_data/wt/20170714_fish1/gfp
                '/media/lauderdale/BFR_RAID5/zebrafish_data/ptz/20170810_fish1/gfp_separated/analysis',\
                '/media/lauderdale/BFR_RAID5/zebrafish_data/ptz/20180116_fish1/gfp_separated/analysis']
 '''
-directories = ['/home/lauderdale/Desktop']
+directories = ['/media/lauderdale/BFR_RAID5/zebrafish_data/wt/20170714_fish1/gfp_separated/analysis']
 
 nonzero_intensities = [len(directories)]
-SD = [len(directories)]
+SD_sum = [len(directories)]
 window_avgs = [len(directories)]
 avg_intensities = [len(directories)]
+SD_avg = [len(directories)]
 video_sum_SD = [len(directories)]
 video_sum_avg = [len(directories)]
 video_avg = [len(directories)]
@@ -76,17 +77,18 @@ for i in range(len(directories)):
 
     directory = directories[i]
     
-    csv_read = pd.read_csv(directory + '/analysis.csv', sep = ',')
+    csv_read = pd.read_csv(directory + '/analysis_' + make_label(directory) + '.csv', sep = ',')
     nonzero_intensities[i] = np.array(csv_read['nonzero_intensities'])
-    SD[i] = np.array(csv_read['SD'])
+    SD_sum[i] = np.array(csv_read['SD_sum'])
     window_avgs[i] = np.array(csv_read['window_avgs'])
     avg_intensities[i] = np.array(csv_read['avg_intensities'])
+    SD_avg[i] = np.array(csv_read['SD_avg'])
     video_sum_SD[i] = np.array(csv_read['video_sum_SD'])
     video_sum_avg[i] = np.array(csv_read['video_sum_avg'])
     video_avg[i] = np.array(csv_read['video_avg'])
     
 
-plot_intensity(nonzero_intensities[0], SD[0], window_avgs[0], 'Summation of ' + make_label(directory))
+plot_intensity(nonzero_intensities[0], SD_sum[0], window_avgs[0], 'Summation of ' + make_label(directory))
 
 #pass those arrays into graphers that label and save them in analysis folder
     #average graph
