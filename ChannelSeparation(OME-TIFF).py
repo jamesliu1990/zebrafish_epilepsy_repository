@@ -23,7 +23,24 @@ import os
 
 
 
-list_of_parent_directories = ['/Volumes/Samsung_T5/zebrafish_data/20170714_fish1_clip']
+list_of_parent_directories = ['/media/lauderdale/BFR_RAID5/zebrafish_data/wt/20170714_fish1',\
+                              '/media/lauderdale/BFR_RAID5/zebrafish_data/wt/20170714_fish2',\
+                              '/media/lauderdale/BFR_RAID5/zebrafish_data/wt/20170714_fish3',\
+                              '/media/lauderdale/BFR_RAID5/zebrafish_data/wt/20170714_fish4',\
+                              '/media/lauderdale/BFR_RAID5/zebrafish_data/wt/20170720_fish1',\
+                              '/media/lauderdale/BFR_RAID5/zebrafish_data/wt/20170720_fish2',\
+                              '/media/lauderdale/BFR_RAID5/zebrafish_data/wt/20170720_fish3',\
+                              '/media/lauderdale/BFR_RAID5/zebrafish_data/wt/20170720_fish4',\
+                              '/media/lauderdale/BFR_RAID5/zebrafish_data/wt/20170725_fish1',\
+                              '/media/lauderdale/BFR_RAID5/zebrafish_data/wt/20170725_fish2',\
+                              \
+                              '/media/lauderdale/BFR_RAID5/zebrafish_data/ptz/20170627_fish3',\
+                              '/media/lauderdale/BFR_RAID5/zebrafish_data/ptz/20170628_fish1',\
+                              '/media/lauderdale/BFR_RAID5/zebrafish_data/ptz/20170629_fish1',\
+                              '/media/lauderdale/BFR_RAID5/zebrafish_data/ptz/20170629_fish2',\
+                              '/media/lauderdale/BFR_RAID5/zebrafish_data/ptz/20170803_fish1',\
+                              '/media/lauderdale/BFR_RAID5/zebrafish_data/ptz/20170810_fish1',\
+                              '/media/lauderdale/BFR_RAID5/zebrafish_data/ptz/20180116_fish1']
 
 for parent_directory in list_of_parent_directories:
 
@@ -36,7 +53,7 @@ for parent_directory in list_of_parent_directories:
             if file.endswith('.tif') and not file.endswith('_suspectedGFP.tif') \
             and not file.endswith('_suspectedRFP.tif') \
             and not file.endswith('_designatedRFP.tif') \
-            and not file.endswith('_designatedRFP.tif'):
+            and not file.endswith('_designatedGFP.tif'):
                     file_list.append(os.path.join(root, file))
                 
                 
@@ -64,6 +81,7 @@ for parent_directory in list_of_parent_directories:
         #Coodinate 2: height in pixels (1024)
         #Coordinate 3: width in pixels (2048)
         #data = np.array(ImageSequence(directory), 'uint16')
+        print('Loading pointer to data...')
         data = np.array(pims.open(directory))
         print('The data has been loaded in...')
         
@@ -142,7 +160,7 @@ for parent_directory in list_of_parent_directories:
         tf.imsave(gfp_manual_filename, gfp_designation)
         print('GFP manual check saved')
         
-        print('Script complete.')
+print('Script complete.')
                             
                             
                             
