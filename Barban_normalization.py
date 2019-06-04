@@ -21,7 +21,7 @@ class Barban:
         """width is sliding window size in seconds, fps is imaging speed 22.72 fps"""
         shape = value.shape
         num_points = shape[0]
-        framenum = int(np.round(width*self.fps)-1)
+        framenum = int(np.round(width*22.72)-1)
         newvalue = np.array([])
         for i in np.arange(framenum,num_points):
             normdata = value[i-framenum:i]
